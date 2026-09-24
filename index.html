@@ -26,7 +26,6 @@
             border: none;
             z-index: 1;
         }
-        /* Splash Screen Masjid Al-Jihad */
         #splash {
             position: fixed;
             inset: 0;
@@ -39,8 +38,6 @@
             color: #ffffff;
             transition: opacity 1s ease;
         }
-
-        /* Wrapper Logo & Cincin Emas Berputar */
         .splash-logo-wrapper {
             position: relative;
             width: clamp(140px, 14vw, 190px);
@@ -50,7 +47,6 @@
             justify-content: center;
             margin-bottom: 24px;
         }
-
         .splash-spinner-ring {
             position: absolute;
             inset: -14px;
@@ -61,26 +57,22 @@
             animation: splashSpin 1.4s linear infinite;
             box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
         }
-
         @keyframes splashSpin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        /* Gambar Logo Masjid Al-Jihad */
         .splash-logo-img {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            filter: drop-shadow(0 0 22px rgba(255, 215, 0, 0.5)) drop-shadow(0 6px 16px rgba(0,0,0,0.7));
+            image-rendering: -webkit-optimize-contrast;
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
             animation: splashLogoPulse 3s ease-in-out infinite alternate;
         }
-
         @keyframes splashLogoPulse {
-            0% { transform: scale(0.97); filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.35)); }
-            100% { transform: scale(1.03); filter: drop-shadow(0 0 28px rgba(255, 215, 0, 0.65)); }
+            0% { transform: scale(0.97); }
+            100% { transform: scale(1.03); }
         }
-
         .title {
             font-size: clamp(22px, 2.5vw, 34px);
             font-weight: 800;
@@ -91,7 +83,6 @@
             margin-bottom: 14px;
             text-align: center;
         }
-
         .status-pill {
             display: inline-flex;
             align-items: center;
@@ -104,21 +95,13 @@
             color: #E2E8F0;
             letter-spacing: 2px;
             font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         }
-
         .dot {
             width: 8px;
             height: 8px;
             background: #FFD700;
             border-radius: 50%;
             box-shadow: 0 0 8px #FFD700;
-            animation: dotPulse 1.2s infinite alternate;
-        }
-
-        @keyframes dotPulse {
-            0% { opacity: 0.4; transform: scale(0.8); }
-            100% { opacity: 1; transform: scale(1.2); }
         }
     </style>
 </head>
@@ -127,10 +110,10 @@
     <div id="splash">
         <div class="splash-logo-wrapper">
             <div class="splash-spinner-ring"></div>
-            <img src="https://digitalaljihad1.onrender.com/img/logo-aljihad-transparent.png"
+            <img src="https://digitalaljihad1.onrender.com/storage/settings/rvcMSGBiimeHugzEGeJ066Bq3MlSwn3ekYiWj7MD.png"
                  alt="Logo Masjid Al-Jihad"
                  class="splash-logo-img"
-                 onerror="this.onerror=null; this.src='https://digitalaljihad1.onrender.com/storage/settings/rvcMSGBiimeHugzEGeJ066Bq3MlSwn3ekYiWj7MD.png';">
+                 onerror="this.onerror=null; this.src='https://digitalaljihad1.onrender.com/img/logo-aljihad-transparent.png';">
         </div>
         <h2 class="title">MASJID JAMI' AL JIHAD</h2>
         <div class="status-pill">
@@ -139,53 +122,19 @@
         </div>
     </div>
 
-    <iframe id="main-frame" src="" allow="autoplay"></iframe>
+    <!-- Iframe display TV yang bersih dan tenang tanpa auto-reload loop -->
+    <iframe id="main-frame" src="https://digitalaljihad1.onrender.com" allow="autoplay"></iframe>
 
     <script>
-        const SERVER_1 = 'https://digitalaljihad1.onrender.com';
-        const SERVER_2 = 'https://digitalaljihad1.onrender.com';
-
-        // Tgl 1 - 15 -> Server 1, Tgl 16 - 31 -> Server 2
-        const today = new Date().getDate();
-        const isFirstHalf = today <= 15;
-
-        let primaryUrl = isFirstHalf ? SERVER_1 : SERVER_2;
-        let backupUrl  = isFirstHalf ? SERVER_2 : SERVER_1;
-
         const splash = document.getElementById('splash');
-        const frame = document.getElementById('main-frame');
 
-        function hideSplash() {
+        // Splash screen hanya muncul 20 detik saat awal TV menyala, lalu hilang selamanya
+        setTimeout(() => {
             splash.style.opacity = '0';
             setTimeout(() => {
                 splash.style.display = 'none';
             }, 1000);
-        }
-
-        function startDisplay() {
-            frame.src = primaryUrl;
-
-            // Splash screen tampil selama 20 detik saat bangun, lalu hilang mulus
-            setTimeout(() => {
-                hideSplash();
-            }, 20000);
-
-            // Failsafe cadangan jika server utama offline/suspend
-            setTimeout(() => {
-                try {
-                    if (!frame.contentWindow || frame.contentDocument === null) {
-                        frame.src = backupUrl;
-                    }
-                } catch(e) {}
-            }, 45000);
-        }
-
-        startDisplay();
-
-        // Refresh otomatis setiap 12 jam agar rotasi tgl 15 ke 16 berjalan lancar
-        setInterval(() => {
-            window.location.reload();
-        }, 12 * 60 * 60 * 1000);
+        }, 20000);
     </script>
 </body>
 </html>
