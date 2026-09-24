@@ -26,7 +26,7 @@
             border: none;
             z-index: 1;
         }
-        /* Splash Screen Masjid Al-Jihad saat Render sedang bangun / memuat */
+        /* Splash Screen Masjid Al-Jihad elegan menutupi layar bangun Render */
         #splash {
             position: fixed;
             inset: 0;
@@ -37,17 +37,17 @@
             align-items: center;
             z-index: 999;
             color: #ffffff;
-            transition: opacity 0.8s ease;
+            transition: opacity 1s ease;
         }
         .spinner-ring {
-            width: 75px;
-            height: 75px;
+            width: 80px;
+            height: 80px;
             border: 4px solid rgba(212, 175, 55, 0.2);
             border-top: 4px solid #FFD700;
             border-right: 4px solid rgba(255, 215, 0, 0.6);
             border-radius: 50%;
             animation: spin 1.2s linear infinite;
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
             margin-bottom: 24px;
         }
         @keyframes spin {
@@ -55,7 +55,7 @@
             100% { transform: rotate(360deg); }
         }
         .title {
-            font-size: clamp(20px, 2.5vw, 32px);
+            font-size: clamp(22px, 2.8vw, 36px);
             font-weight: 800;
             letter-spacing: 3px;
             color: #FFFFFF;
@@ -67,7 +67,7 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            padding: 6px 20px;
+            padding: 6px 22px;
             border-radius: 30px;
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(212, 175, 55, 0.4);
@@ -81,20 +81,11 @@
             background: #FFD700;
             border-radius: 50%;
             box-shadow: 0 0 8px #FFD700;
+            animation: pulse 1s infinite alternate;
         }
-        /* Penanda Server Kecil di Pojok Kanan Bawah */
-        #server-badge {
-            position: fixed;
-            bottom: 8px;
-            right: 8px;
-            background: rgba(0,0,0,0.6);
-            color: #a0aec0;
-            font-size: 10px;
-            padding: 3px 8px;
-            border-radius: 6px;
-            z-index: 10;
-            font-family: monospace;
-            opacity: 0.4;
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            100% { opacity: 1; }
         }
     </style>
 </head>
@@ -105,70 +96,58 @@
         <div class="title">MASJID JAMI' AL JIHAD</div>
         <div class="status-pill">
             <span class="dot"></span>
-            <span id="status-text">Menghubungkan ke Server Display TV...</span>
+            <span id="status-text">Memuat Sistem Display TV...</span>
         </div>
     </div>
-
-    <div id="server-badge">Server --</div>
 
     <iframe id="main-frame" src="" allow="autoplay"></iframe>
 
     <script>
-        // DAFTAR KEDUA URL SERVER RENDER
         const SERVER_1 = 'https://digital-aljihad.onrender.com';
         const SERVER_2 = 'https://digitalaljihad1.onrender.com';
 
-        // ROTASI OTOMATIS:
-        // Tgl 1 - 15  : Prioritas Server 1 (Server 2 sleep/hemat kuota)
-        // Tgl 16 - 31 : Prioritas Server 2 (Server 1 sleep/hemat kuota)
+        // Tgl 1-15 -> Server 1, Tgl 16-31 -> Server 2
         const today = new Date().getDate();
         const isFirstHalf = today <= 15;
 
         let primaryUrl = isFirstHalf ? SERVER_1 : SERVER_2;
         let backupUrl  = isFirstHalf ? SERVER_2 : SERVER_1;
-        let primaryName = isFirstHalf ? 'Server 1 (Tgl 1-15)' : 'Server 2 (Tgl 16-31)';
-        let backupName  = isFirstHalf ? 'Server 2 (Cadangan)' : 'Server 1 (Cadangan)';
 
         const splash = document.getElementById('splash');
         const statusText = document.getElementById('status-text');
-        const badge = document.getElementById('server-badge');
         const frame = document.getElementById('main-frame');
 
-        let isLoaded = false;
-
-        function loadDisplay(url, name, isBackup = false) {
-            badge.innerText = name;
-            statusText.innerText = isBackup 
-                ? 'Server utama offline, beralih ke Server Cadangan...' 
-                : 'Menghubungkan ke ' + name + '...';
-
-            frame.src = url;
-
-            // Timer Deteksi Otomatis (Failover):
-            // Jika dalam 50 detik server utama belum terbuka (misal kena suspend/mati)
-            const failsafeTimer = setTimeout(() => {
-                if (!isLoaded && !isBackup) {
-                    console.warn('Server utama tidak merespons dalam 50 detik, pindah ke server cadangan...');
-                    loadDisplay(backupUrl, backupName, true);
-                }
-            }, 50000);
-
-            frame.onload = () => {
-                clearTimeout(failsafeTimer);
-                isLoaded = true;
-                // Hilangkan splash screen dengan mulus
-                setTimeout(() => {
-                    splash.style.opacity = '0';
-                    setTimeout(() => splash.style.display = 'none', 800);
-                }, 1500);
-            };
+        function hideSplash() {
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.style.display = 'none';
+            }, 1000);
         }
 
-        // Jalankan pemuatan server
-        loadDisplay(primaryUrl, primaryName);
+        function startDisplay() {
+            frame.src = primaryUrl;
 
-        // Auto-refresh setiap 12 jam agar saat pergantian tanggal 15 ke 16,
-        // TV otomatis berpindah server tanpa perlu restart TV
+            // Tunggu 25 detik agar layar "Waking Up" Render selesai di latar belakang,
+            // sehingga jamaah hanya melihat Splash Screen Al-Jihad yang indah.
+            setTimeout(() => {
+                hideSplash();
+            }, 25000);
+
+            // Failsafe jika server utama mati/suspend (pindah ke backup setelah 45 dtk)
+            setTimeout(() => {
+                try {
+                    // Cek jika frame kosong atau error
+                    if (!frame.contentWindow || frame.contentDocument === null) {
+                        console.warn('Beralih ke server cadangan...');
+                        frame.src = backupUrl;
+                    }
+                } catch(e) {}
+            }, 45000);
+        }
+
+        startDisplay();
+
+        // Refresh otomatis setiap 12 jam agar rotasi tgl 15 ke 16 berjalan mulus
         setInterval(() => {
             window.location.reload();
         }, 12 * 60 * 60 * 1000);
