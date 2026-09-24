@@ -26,7 +26,7 @@
             border: none;
             z-index: 1;
         }
-        /* Splash Screen Masjid Al-Jihad elegan menutupi layar bangun Render */
+        /* Splash Screen Masjid Al-Jihad */
         #splash {
             position: fixed;
             inset: 0;
@@ -39,64 +39,103 @@
             color: #ffffff;
             transition: opacity 1s ease;
         }
-        .spinner-ring {
-            width: 80px;
-            height: 80px;
-            border: 4px solid rgba(212, 175, 55, 0.2);
-            border-top: 4px solid #FFD700;
-            border-right: 4px solid rgba(255, 215, 0, 0.6);
-            border-radius: 50%;
-            animation: spin 1.2s linear infinite;
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+
+        /* Wrapper Logo & Cincin Emas Berputar */
+        .splash-logo-wrapper {
+            position: relative;
+            width: clamp(140px, 14vw, 190px);
+            height: clamp(140px, 14vw, 190px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             margin-bottom: 24px;
         }
-        @keyframes spin {
+
+        .splash-spinner-ring {
+            position: absolute;
+            inset: -14px;
+            border-radius: 50%;
+            border: 3px solid rgba(212, 175, 55, 0.15);
+            border-top: 3px solid #FFD700;
+            border-right: 3px solid rgba(255, 215, 0, 0.6);
+            animation: splashSpin 1.4s linear infinite;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
+        }
+
+        @keyframes splashSpin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .title {
-            font-size: clamp(22px, 2.8vw, 36px);
-            font-weight: 800;
-            letter-spacing: 3px;
-            color: #FFFFFF;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.5);
-            margin-bottom: 12px;
-            text-transform: uppercase;
+
+        /* Gambar Logo Masjid Al-Jihad */
+        .splash-logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 22px rgba(255, 215, 0, 0.5)) drop-shadow(0 6px 16px rgba(0,0,0,0.7));
+            animation: splashLogoPulse 3s ease-in-out infinite alternate;
         }
+
+        @keyframes splashLogoPulse {
+            0% { transform: scale(0.97); filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.35)); }
+            100% { transform: scale(1.03); filter: drop-shadow(0 0 28px rgba(255, 215, 0, 0.65)); }
+        }
+
+        .title {
+            font-size: clamp(22px, 2.5vw, 34px);
+            font-weight: 800;
+            letter-spacing: 4px;
+            color: #FFFFFF;
+            text-transform: uppercase;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.4);
+            margin-bottom: 14px;
+            text-align: center;
+        }
+
         .status-pill {
             display: inline-flex;
             align-items: center;
             gap: 10px;
             padding: 6px 22px;
             border-radius: 30px;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.45);
             border: 1px solid rgba(212, 175, 55, 0.4);
-            font-size: 13px;
+            font-size: clamp(11px, 1vw, 14px);
             color: #E2E8F0;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         }
+
         .dot {
             width: 8px;
             height: 8px;
             background: #FFD700;
             border-radius: 50%;
             box-shadow: 0 0 8px #FFD700;
-            animation: pulse 1s infinite alternate;
+            animation: dotPulse 1.2s infinite alternate;
         }
-        @keyframes pulse {
-            0% { opacity: 0.4; }
-            100% { opacity: 1; }
+
+        @keyframes dotPulse {
+            0% { opacity: 0.4; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
         }
     </style>
 </head>
 <body>
 
     <div id="splash">
-        <div class="spinner-ring"></div>
-        <div class="title">MASJID JAMI' AL JIHAD</div>
+        <div class="splash-logo-wrapper">
+            <div class="splash-spinner-ring"></div>
+            <img src="https://digitalaljihad1.onrender.com/img/logo-aljihad-transparent.png"
+                 alt="Logo Masjid Al-Jihad"
+                 class="splash-logo-img"
+                 onerror="this.onerror=null; this.src='https://digitalaljihad1.onrender.com/storage/settings/rvcMSGBiimeHugzEGeJ066Bq3MlSwn3ekYiWj7MD.png';">
+        </div>
+        <h2 class="title">MASJID JAMI' AL JIHAD</h2>
         <div class="status-pill">
             <span class="dot"></span>
-            <span id="status-text">Memuat Sistem Display TV...</span>
+            <span id="status-text">MEMUAT TAMPILAN...</span>
         </div>
     </div>
 
@@ -106,7 +145,7 @@
         const SERVER_1 = 'https://digital-aljihad.onrender.com';
         const SERVER_2 = 'https://digitalaljihad1.onrender.com';
 
-        // Tgl 1-15 -> Server 1, Tgl 16-31 -> Server 2
+        // Tgl 1 - 15 -> Server 1, Tgl 16 - 31 -> Server 2
         const today = new Date().getDate();
         const isFirstHalf = today <= 15;
 
@@ -114,7 +153,6 @@
         let backupUrl  = isFirstHalf ? SERVER_2 : SERVER_1;
 
         const splash = document.getElementById('splash');
-        const statusText = document.getElementById('status-text');
         const frame = document.getElementById('main-frame');
 
         function hideSplash() {
@@ -127,18 +165,15 @@
         function startDisplay() {
             frame.src = primaryUrl;
 
-            // Tunggu 25 detik agar layar "Waking Up" Render selesai di latar belakang,
-            // sehingga jamaah hanya melihat Splash Screen Al-Jihad yang indah.
+            // Splash screen tampil selama 20 detik saat bangun, lalu hilang mulus
             setTimeout(() => {
                 hideSplash();
-            }, 25000);
+            }, 20000);
 
-            // Failsafe jika server utama mati/suspend (pindah ke backup setelah 45 dtk)
+            // Failsafe cadangan jika server utama offline/suspend
             setTimeout(() => {
                 try {
-                    // Cek jika frame kosong atau error
                     if (!frame.contentWindow || frame.contentDocument === null) {
-                        console.warn('Beralih ke server cadangan...');
                         frame.src = backupUrl;
                     }
                 } catch(e) {}
@@ -147,7 +182,7 @@
 
         startDisplay();
 
-        // Refresh otomatis setiap 12 jam agar rotasi tgl 15 ke 16 berjalan mulus
+        // Refresh otomatis setiap 12 jam agar rotasi tgl 15 ke 16 berjalan lancar
         setInterval(() => {
             window.location.reload();
         }, 12 * 60 * 60 * 1000);
