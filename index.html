@@ -14,8 +14,9 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #050505;
+            background-color: #03150b;
             font-family: 'Poppins', 'Segoe UI', Tahoma, sans-serif;
+            color: #ffffff;
         }
         iframe {
             position: absolute;
@@ -26,6 +27,8 @@
             border: none;
             z-index: 1;
         }
+
+        /* === 1. TAMPILAN SPLASH SCREEN === */
         #splash {
             position: fixed;
             inset: 0;
@@ -35,7 +38,6 @@
             justify-content: center;
             align-items: center;
             z-index: 999;
-            color: #ffffff;
             transition: opacity 0.8s ease, visibility 0.8s ease;
         }
         .splash-logo-wrapper {
@@ -95,7 +97,6 @@
             color: #E2E8F0;
             letter-spacing: 1.5px;
             font-weight: 600;
-            transition: all 0.3s ease;
         }
         .dot {
             width: 9px;
@@ -109,11 +110,90 @@
             0%, 100% { opacity: 0.3; transform: scale(0.85); }
             50% { opacity: 1; transform: scale(1.15); }
         }
+
+        /* === 2. TAMPILAN HALAMAN PERBAIKAN (MAINTENANCE) === */
+        #maintenance-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 10;
+            background: radial-gradient(circle at center, #07351e 0%, #031c0e 65%, #010c06 100%);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px;
+        }
+        .maintenance-card {
+            background: rgba(8, 48, 27, 0.65);
+            border: 1px solid rgba(212, 175, 55, 0.35);
+            backdrop-filter: blur(12px);
+            padding: clamp(28px, 4vw, 50px);
+            border-radius: 24px;
+            max-width: 680px;
+            width: 90%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 35px rgba(212, 175, 55, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .maintenance-icon {
+            font-size: clamp(40px, 5vw, 60px);
+            margin-bottom: 16px;
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.5));
+        }
+        .maintenance-badge {
+            background: rgba(212, 175, 55, 0.15);
+            color: #FFD700;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 13px;
+            letter-spacing: 2px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .maintenance-title {
+            font-size: clamp(20px, 2.5vw, 30px);
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 14px;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .maintenance-desc {
+            font-size: clamp(14px, 1.2vw, 17px);
+            color: #d1fae5;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        .clock-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 28px;
+            border-radius: 14px;
+            display: inline-flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .clock-time {
+            font-size: clamp(28px, 3.5vw, 44px);
+            font-weight: 800;
+            color: #FFD700;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 2px;
+        }
+        .clock-date {
+            font-size: clamp(12px, 1vw, 14px);
+            color: #94a3b8;
+            letter-spacing: 1px;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Splash Screen Dinamis -->
+    <!-- 1. SPLASH SCREEN -->
     <div id="splash">
         <div class="splash-logo-wrapper">
             <div class="splash-spinner-ring"></div>
@@ -122,139 +202,127 @@
         <h2 class="title">MASJID JAMI' AL JIHAD</h2>
         <div class="status-pill">
             <span class="dot" id="status-dot"></span>
-            <span id="status-text">MEMERIKSA TANGGAL SERVER...</span>
+            <span id="status-text">MEMERIKSA STATUS SISTEM...</span>
         </div>
     </div>
 
-    <!-- Iframe Display TV -->
+    <!-- 2. LAYAR PEMELIHARAAN SISTEM -->
+    <div id="maintenance-screen">
+        <div class="maintenance-card">
+            <div class="maintenance-icon">⚙️</div>
+            <div class="maintenance-badge">PEMELIHARAAN SISTEM</div>
+            <h1 class="maintenance-title">SEDANG DALAM PERBAIKAN</h1>
+            <p class="maintenance-desc">
+                Layanan Display TV Digital Masjid Jami' Al Jihad sedang dalam proses optimalisasi dan pemeliharaan server berkala. Layanan akan segera kembali aktif.
+            </p>
+            <div class="clock-box">
+                <div class="clock-time" id="live-clock">--:--:--</div>
+                <div class="clock-date" id="live-date">Memuat tanggal...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. IFRAME DISPLAY TV RENDER -->
     <iframe id="main-frame" allow="autoplay; fullscreen" loading="eager"></iframe>
 
     <script>
         // ========================================================
-        // 1. KONFIGURASI DUA AKUN RENDER
+        // SAKLAR MODE UTAMA:
+        // Set TRUE  = Tampilkan layar "Sedang Dalam Perbaikan"
+        // Set FALSE = Jalankan switcher 2 server Render
         // ========================================================
-        const SERVER_1 = "https://digitalaljihad1.onrender.com";   // Aktif: Tanggal 1 s/d 15
-        const SERVER_2 = "https://digital-aljihad.onrender.com";  // Aktif: Tanggal 16 s/d 31
+        const MODE_PERBAIKAN = true;
 
-        // Path logo masjid
-        const logoPath = "/storage/settings/rvcMSGBiimeHugzEGeJ066Bq3MlSwn3ekYiWj7MD.png";
-        const fallbackLogoPath = "/img/logo-aljihad-transparent.png";
+        // URL Dua Server Render
+        const SERVER_1 = "https://digitalaljihad1.onrender.com";   // Tanggal 1 - 15
+        const SERVER_2 = "https://digital-aljihad.onrender.com";  // Tanggal 16 - 31
 
-        // ========================================================
-        // 2. PENENTUAN SERVER BERDASARKAN TANGGAL
-        // ========================================================
-        let currentDayActive = new Date().getDate(); // 1 - 31
-        let primaryServer = (currentDayActive <= 15) ? SERVER_1 : SERVER_2;
-        let backupServer  = (currentDayActive <= 15) ? SERVER_2 : SERVER_1;
-        
-        let primaryLabel = (currentDayActive <= 15) ? "RENDER 1 (Tgl 1-15)" : "RENDER 2 (Tgl 16-31)";
-        let backupLabel  = (currentDayActive <= 15) ? "RENDER 2 (Cadangan)" : "RENDER 1 (Cadangan)";
-
-        let isDisplayLoaded = false;
-        let coldStartTimer = null;
-        let failoverTimer = null;
-
+        const logoPath = "/img/logo-aljihad-transparent.png";
         const splash = document.getElementById('splash');
         const statusText = document.getElementById('status-text');
         const splashImg = document.getElementById('splash-img');
         const mainFrame = document.getElementById('main-frame');
+        const maintenanceScreen = document.getElementById('maintenance-screen');
 
-        // Pasang logo pada splash screen
-        splashImg.src = primaryServer + logoPath;
+        splashImg.src = logoPath;
         splashImg.onerror = function() {
-            this.onerror = null;
-            this.src = primaryServer + fallbackLogoPath;
-            // Jika di primaryServer gagal, coba ambil logo dari backupServer
-            this.onerror = function() {
-                this.src = backupServer + fallbackLogoPath;
-            };
+            this.src = "https://raw.githubusercontent.com/mydowndrive-ops/digitalaljihad001/main/public/img/logo-aljihad-transparent.png";
         };
 
-        function updateStatus(msg) {
-            if (statusText) statusText.textContent = msg;
-        }
-
-        // ========================================================
-        // 3. FUNGSI MENUTUP SPLASH SCREEN SECARA HALUS
-        // ========================================================
         function dismissSplash() {
-            if (isDisplayLoaded) return;
-            isDisplayLoaded = true;
-            if (coldStartTimer) clearTimeout(coldStartTimer);
-            if (failoverTimer) clearTimeout(failoverTimer);
-
-            updateStatus("TAMPILAN SIAP");
             setTimeout(() => {
                 splash.style.opacity = '0';
                 setTimeout(() => {
                     splash.style.visibility = 'hidden';
                     splash.style.display = 'none';
                 }, 800);
-            }, 600);
+            }, 500);
         }
 
         // ========================================================
-        // 4. MEMUAT SERVER KE IFRAME
+        // EKSEKUSI TAMPILAN
         // ========================================================
-        function startLoadingServer(targetUrl, targetLabel, isFallbackAttempt = false) {
-            updateStatus(`MENGHUBUNGKAN: ${targetLabel}...`);
-            mainFrame.src = targetUrl;
+        if (MODE_PERBAIKAN) {
+            // MODE PERBAIKAN AKTIF
+            if (statusText) statusText.textContent = "MEMPERSIAPKAN INFORMASI...";
 
-            // Jika butuh waktu > 7 detik, kemungkinan Render sedang Cold Start
-            coldStartTimer = setTimeout(() => {
-                if (!isDisplayLoaded) {
-                    updateStatus("MEMBANGUNKAN SERVER RENDER...");
+            function updateClock() {
+                const now = new Date();
+                const clockEl = document.getElementById('live-clock');
+                const dateEl = document.getElementById('live-date');
+                if (clockEl) {
+                    clockEl.textContent = now.toLocaleTimeString('id-ID', { hour12: false });
                 }
-            }, 7000);
-
-            // Jika dalam 30 detik server belum terbuka dan belum mencoba fallback:
-            // Alihkan otomatis ke akun Render yang satunya
-            if (!isFallbackAttempt) {
-                failoverTimer = setTimeout(() => {
-                    if (!isDisplayLoaded) {
-                        clearTimeout(coldStartTimer);
-                        console.warn("Server utama tidak merespon/suspend. Beralih ke akun Render cadangan...");
-                        updateStatus(`MENCOBA ${backupLabel}...`);
-                        startLoadingServer(backupServer, backupLabel, true);
-                    }
-                }, 30000);
+                if (dateEl) {
+                    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                    dateEl.textContent = now.toLocaleDateString('id-ID', options);
+                }
             }
-        }
+            setInterval(updateClock, 1000);
+            updateClock();
 
-        // Jalankan pemuatan server utama saat pertama dibuka
-        startLoadingServer(primaryServer, primaryLabel, false);
+            mainFrame.style.display = "none";
+            maintenanceScreen.style.display = "flex";
 
-        // Saat iframe selesai memuat konten
-        mainFrame.onload = function() {
-            dismissSplash();
-        };
-
-        // Batas maksimal mutlak: jika setelah 50 detik belum tertutup, paksa buka splash
-        setTimeout(() => {
-            if (!isDisplayLoaded) {
+            setTimeout(() => {
                 dismissSplash();
-            }
-        }, 50000);
+            }, 2500);
 
-        // ========================================================
-        // 5. MONITOR PERGANTIAN HARI & AUTO-SWITCH TENGAH MALAM
-        // ========================================================
-        // Mengecek tanggal setiap 60 detik. Saat pergantian tanggal dari 15 ke 16 (atau akhir bulan ke tgl 1),
-        // TV akan otomatis reload dan beralih server sendiri tanpa perlu disentuh.
-        setInterval(() => {
-            const now = new Date();
-            const checkedDay = now.getDate();
-            if (checkedDay !== currentDayActive) {
-                console.log("Pergantian tanggal terdeteksi! Memperbarui akun Render...");
+            // Cek ulang otomatis setiap 5 menit
+            setInterval(() => {
                 window.location.reload();
-            }
+            }, 300000);
 
-            // Pemeliharaan rutin memori TV setiap pukul 03:15 WIB (sebelum Subuh)
-            if (now.getHours() === 3 && now.getMinutes() === 15 && now.getSeconds() < 60) {
-                console.log("Penyegaran memori TV harian (03:15 WIB)...");
-                window.location.reload();
-            }
-        }, 60000);
+        } else {
+            // MODE NORMAL (KEDUA SERVER RENDER AKTIF)
+            maintenanceScreen.style.display = "none";
+            mainFrame.style.display = "block";
+
+            let currentDay = new Date().getDate();
+            let targetServer = (currentDay <= 15) ? SERVER_1 : SERVER_2;
+            let targetLabel = (currentDay <= 15) ? "RENDER 1 (Tgl 1-15)" : "RENDER 2 (Tgl 16-31)";
+
+            if (statusText) statusText.textContent = `MENGHUBUNGKAN: ${targetLabel}...`;
+            mainFrame.src = targetServer;
+
+            mainFrame.onload = function() {
+                if (statusText) statusText.textContent = "TAMPILAN SIAP";
+                dismissSplash();
+            };
+
+            setTimeout(() => {
+                dismissSplash();
+            }, 40000);
+
+            // Auto-switch tengah malam & pembersihan memori jam 03:15 pagi
+            setInterval(() => {
+                const now = new Date();
+                if (now.getDate() !== currentDay) window.location.reload();
+                if (now.getHours() === 3 && now.getMinutes() === 15 && now.getSeconds() < 60) {
+                    window.location.reload();
+                }
+            }, 60000);
+        }
     </script>
 </body>
 </html>
