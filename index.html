@@ -14,7 +14,7 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #03150b;
+            background-color: #050505;
             font-family: 'Poppins', 'Segoe UI', Tahoma, sans-serif;
             color: #ffffff;
         }
@@ -29,7 +29,90 @@
             display: none;
         }
 
-        /* === 1. TAMPILAN HALAMAN PERBAIKAN (LANGSUNG SIAP DI BALIK SPLASH) === */
+        /* === 1. TAMPILAN SPLASH SCREEN ASLI === */
+        #splash {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at center, #0d4a2b 0%, #052917 55%, #01140b 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        .splash-logo-wrapper {
+            position: relative;
+            width: clamp(140px, 14vw, 190px);
+            height: clamp(140px, 14vw, 190px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+        .splash-spinner-ring {
+            position: absolute;
+            inset: -14px;
+            border-radius: 50%;
+            border: 3px solid rgba(212, 175, 55, 0.15);
+            border-top: 3px solid #FFD700;
+            border-right: 3px solid rgba(255, 215, 0, 0.6);
+            animation: splashSpin 1.4s linear infinite;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
+        }
+        @keyframes splashSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .splash-logo-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            image-rendering: -webkit-optimize-contrast;
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
+            animation: splashLogoPulse 3s ease-in-out infinite alternate;
+        }
+        @keyframes splashLogoPulse {
+            0% { transform: scale(0.97); }
+            100% { transform: scale(1.03); }
+        }
+        .title {
+            font-size: clamp(22px, 2.5vw, 34px);
+            font-weight: 800;
+            letter-spacing: 4px;
+            color: #FFFFFF;
+            text-transform: uppercase;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.4);
+            margin-bottom: 14px;
+            text-align: center;
+        }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 24px;
+            border-radius: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            font-size: clamp(11px, 1vw, 13px);
+            color: #E2E8F0;
+            letter-spacing: 1.5px;
+            font-weight: 600;
+        }
+        .dot {
+            width: 9px;
+            height: 9px;
+            background: #FFD700;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #FFD700;
+            animation: dotBlink 1.2s infinite ease-in-out;
+        }
+        @keyframes dotBlink {
+            0%, 100% { opacity: 0.3; transform: scale(0.85); }
+            50% { opacity: 1; transform: scale(1.15); }
+        }
+
+        /* === 2. TAMPILAN HALAMAN PERBAIKAN (MAINTENANCE) === */
         #maintenance-screen {
             position: fixed;
             inset: 0;
@@ -55,11 +138,10 @@
             flex-direction: column;
             align-items: center;
         }
-        .maintenance-logo {
-            width: clamp(70px, 8vw, 95px);
-            height: clamp(70px, 8vw, 95px);
-            margin-bottom: 16px;
-            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
+        .maintenance-icon {
+            font-size: clamp(38px, 4.5vw, 54px);
+            margin-bottom: 14px;
+            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.5));
         }
         .maintenance-badge {
             background: rgba(212, 175, 55, 0.15);
@@ -75,18 +157,6 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-        }
-        .badge-dot {
-            width: 8px;
-            height: 8px;
-            background: #FFD700;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #FFD700;
-            animation: pulseDot 1.2s infinite ease-in-out;
-        }
-        @keyframes pulseDot {
-            0%, 100% { opacity: 0.3; transform: scale(0.85); }
-            50% { opacity: 1; transform: scale(1.15); }
         }
         .maintenance-title {
             font-size: clamp(20px, 2.4vw, 30px);
@@ -123,109 +193,36 @@
             color: #cbd5e1;
             letter-spacing: 1px;
         }
-
-        /* === 2. SPLASH SCREEN (DI ATAS SEBAGAI PENUTUP AWAL) === */
-        #splash {
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(ellipse at center, #0d4a2b 0%, #052917 55%, #01140b 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-            transition: opacity 0.8s ease, visibility 0.8s ease;
-        }
-        .splash-logo-wrapper {
-            position: relative;
-            width: clamp(130px, 13vw, 180px);
-            height: clamp(130px, 13vw, 180px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        .splash-spinner-ring {
-            position: absolute;
-            inset: -12px;
-            border-radius: 50%;
-            border: 3px solid rgba(212, 175, 55, 0.15);
-            border-top: 3px solid #FFD700;
-            border-right: 3px solid rgba(255, 215, 0, 0.6);
-            animation: splashSpin 1.4s linear infinite;
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
-        }
-        @keyframes splashSpin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .splash-svg-icon {
-            width: 75%;
-            height: 75%;
-            filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.6));
-            animation: splashLogoPulse 3s ease-in-out infinite alternate;
-        }
-        @keyframes splashLogoPulse {
-            0% { transform: scale(0.96); }
-            100% { transform: scale(1.04); }
-        }
-        .title {
-            font-size: clamp(20px, 2.3vw, 32px);
-            font-weight: 800;
-            letter-spacing: 4px;
-            color: #FFFFFF;
-            text-transform: uppercase;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.4);
-            margin-bottom: 12px;
-            text-align: center;
-        }
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            padding: 7px 22px;
-            border-radius: 30px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            font-size: clamp(11px, 1vw, 13px);
-            color: #E2E8F0;
-            letter-spacing: 1.5px;
-            font-weight: 600;
-        }
     </style>
 </head>
 <body>
 
-    <!-- 1. SPLASH SCREEN (Animasi Pembuka) -->
+    <!-- 1. SPLASH SCREEN DENGAN LOGO ASLI ANDA -->
     <div id="splash">
         <div class="splash-logo-wrapper">
             <div class="splash-spinner-ring"></div>
-            <!-- Ikon Masjid Vektor Emas (Pasti muncul, tidak akan pernah 404) -->
-            <svg class="splash-svg-icon" viewBox="0 0 24 24" fill="#FFD700">
-                <path d="M12 2L10.5 5.5H13.5L12 2ZM12 6C9.5 6 7 8 7 11V21H17V11C17 8 14.5 6 12 6ZM13 19H11V14C11 13.4 11.4 13 12 13C12.6 13 13 13.4 13 14V19ZM4 12V21H6V12H4ZM18 12V21H20V12H18Z"/>
-            </svg>
+            <img id="splash-img"
+                 alt="Logo Masjid Al-Jihad"
+                 class="splash-logo-img">
         </div>
         <h2 class="title">MASJID JAMI' AL JIHAD</h2>
         <div class="status-pill">
-            <span class="badge-dot"></span>
+            <span class="dot"></span>
             <span id="status-text">MEMUAT TAMPILAN...</span>
         </div>
     </div>
 
-    <!-- 2. LAYAR PEMELIHARAAN SISTEM (Pasti Muncul) -->
+    <!-- 2. LAYAR INFORMASI PERBAIKAN -->
     <div id="maintenance-screen">
         <div class="maintenance-card">
-            <!-- Ikon Kubah Masjid Emas -->
-            <svg class="maintenance-logo" viewBox="0 0 24 24" fill="#FFD700">
-                <path d="M12 2L10.5 5.5H13.5L12 2ZM12 6C9.5 6 7 8 7 11V21H17V11C17 8 14.5 6 12 6ZM13 19H11V14C11 13.4 11.4 13 12 13C12.6 13 13 13.4 13 14V19ZM4 12V21H6V12H4ZM18 12V21H20V12H18Z"/>
-            </svg>
+            <div class="maintenance-icon">⚙️</div>
             <div class="maintenance-badge">
-                <span class="badge-dot"></span>
+                <span class="dot"></span>
                 <span>PEMELIHARAAN SISTEM</span>
             </div>
             <h1 class="maintenance-title">SEDANG DALAM PERBAIKAN</h1>
             <p class="maintenance-desc">
-                Layanan Display TV Digital Masjid Jami' Al Jihad saat ini sedang dalam proses optimalisasi dan sinkronisasi server berkala. Layanan akan segera kembali aktif.
+                Layanan Display TV Digital Masjid Jami' Al Jihad saat ini sedang dalam proses optimalisasi dan pemeliharaan server berkala. Layanan akan segera kembali aktif.
             </p>
             <div class="clock-box">
                 <div class="clock-time" id="live-clock">--:--:--</div>
@@ -234,24 +231,43 @@
         </div>
     </div>
 
-    <!-- 3. IFRAME DISPLAY RENDER (Hanya aktif jika MODE_PERBAIKAN = false) -->
+    <!-- 3. IFRAME DISPLAY TV RENDER -->
     <iframe id="main-frame" allow="autoplay; fullscreen"></iframe>
 
     <script>
         // ========================================================
         // SAKLAR KONTROL UTAMA:
-        // Set TRUE  = Tampilkan halaman "Sedang Dalam Perbaikan"
-        // Set FALSE = Jalankan switcher 2 server Render secara normal
+        // Set TRUE  = Tampilkan layar "Sedang Dalam Perbaikan"
+        // Set FALSE = Jalankan switcher 2 server Render normal
         // ========================================================
         const MODE_PERBAIKAN = true;
 
+        // URL Dua Akun Render
         const SERVER_1 = "https://digitalaljihad1.onrender.com";   // Tanggal 1 - 15
         const SERVER_2 = "https://digital-aljihad.onrender.com";  // Tanggal 16 - 31
 
+        // Penentuan Server Berdasarkan Tanggal
+        const today = new Date();
+        const currentDay = today.getDate();
+        const activeServer = (currentDay <= 15) ? SERVER_1 : SERVER_2;
+        const targetLabel = (currentDay <= 15) ? "RENDER 1 (Tgl 1-15)" : "RENDER 2 (Tgl 16-31)";
+
+        // Path Gambar Logo Asli Anda
+        const logoPath = "/storage/settings/rvcMSGBiimeHugzEGeJ066Bq3MlSwn3ekYiWj7MD.png";
+        const fallbackLogoPath = "/img/logo-aljihad-transparent.png";
+
         const splash = document.getElementById('splash');
         const statusText = document.getElementById('status-text');
+        const splashImg = document.getElementById('splash-img');
         const mainFrame = document.getElementById('main-frame');
         const maintenanceScreen = document.getElementById('maintenance-screen');
+
+        // Memuat logo asli dengan fallback aman (mencegah loop)
+        splashImg.src = activeServer + logoPath;
+        splashImg.onerror = function() {
+            this.onerror = null; // Menahan agar tidak terjadi perulangan error
+            this.src = activeServer + fallbackLogoPath;
+        };
 
         function dismissSplash() {
             if (!splash) return;
@@ -263,13 +279,13 @@
         }
 
         // ========================================================
-        // LOGIKA EKSEKUSI
+        // LOGIKA TAMPILAN
         // ========================================================
         if (MODE_PERBAIKAN) {
             // === MODE PERBAIKAN AKTIF ===
             if (statusText) statusText.textContent = "MEMPERSIAPKAN TAMPILAN...";
 
-            // Menjalankan jam & tanggal digital
+            // Menjalankan jam & tanggal digital di layar perbaikan
             function updateClock() {
                 const now = new Date();
                 const clockEl = document.getElementById('live-clock');
@@ -286,35 +302,31 @@
             setInterval(updateClock, 1000);
             updateClock();
 
-            // Buka splash screen setelah 1.5 detik
-            setTimeout(dismissSplash, 1500);
+            // Transisi halus splash screen ke kartu informasi perbaikan
+            setTimeout(dismissSplash, 2000);
 
-            // Cek refresh otomatis setiap 5 menit
+            // Cek ulang otomatis setiap 5 menit
             setInterval(() => {
                 window.location.reload();
             }, 300000);
 
         } else {
-            // === MODE NORMAL (RENDER AKTIF) ===
+            // === MODE NORMAL (KEDUA SERVER RENDER AKTIF) ===
             if (maintenanceScreen) maintenanceScreen.style.display = "none";
             if (mainFrame) mainFrame.style.display = "block";
 
-            let currentDay = new Date().getDate();
-            let targetServer = (currentDay <= 15) ? SERVER_1 : SERVER_2;
-            let targetLabel = (currentDay <= 15) ? "RENDER 1 (Tgl 1-15)" : "RENDER 2 (Tgl 16-31)";
-
             if (statusText) statusText.textContent = `MENGHUBUNGKAN: ${targetLabel}...`;
-            mainFrame.src = targetServer;
+            mainFrame.src = activeServer;
 
             mainFrame.onload = function() {
                 if (statusText) statusText.textContent = "TAMPILAN SIAP";
                 dismissSplash();
             };
 
-            // Pengaman splash maksimal 35 detik jika cold start
+            // Batas maksimal jika cold start
             setTimeout(dismissSplash, 35000);
 
-            // Auto switch tengah malam
+            // Auto-switch tengah malam saat pergantian hari
             setInterval(() => {
                 const now = new Date();
                 if (now.getDate() !== currentDay) window.location.reload();
