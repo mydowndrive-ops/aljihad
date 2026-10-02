@@ -110,10 +110,9 @@
     <div id="splash">
         <div class="splash-logo-wrapper">
             <div class="splash-spinner-ring"></div>
-            <img src="https://digitalaljihad1.onrender.com/storage/settings/rvcMSGBiimeHugzEGeJ066Bq3MlSwn3ekYiWj7MD.png"
+            <img id="splash-img"
                  alt="Logo Masjid Al-Jihad"
-                 class="splash-logo-img"
-                 onerror="this.onerror=null; this.src='https://digitalaljihad1.onrender.com/img/logo-aljihad-transparent.png';">
+                 class="splash-logo-img">
         </div>
         <h2 class="title">MASJID JAMI' AL JIHAD</h2>
         <div class="status-pill">
@@ -122,13 +121,37 @@
         </div>
     </div>
 
-    <!-- Iframe display TV yang bersih dan tenang tanpa auto-reload loop -->
-    <iframe id="main-frame" src="https://digitalaljihad1.onrender.com" allow="autoplay"></iframe>
+    <!-- Iframe display TV (src diset lewat JavaScript) -->
+    <iframe id="main-frame" allow="autoplay"></iframe>
 
     <script>
-        const splash = document.getElementById('splash');
+        // === 1. KONFIGURASI URL DUA AKUN RENDER ===
+        const SERVER_1 = "https://digitalaljihad1.onrender.com";
+        const SERVER_2 = "https://digitalaljihad2.onrender.com"; // Sesuaikan dengan domain akun 2
 
-        // Splash screen hanya muncul 20 detik saat awal TV menyala, lalu hilang selamanya
+        // === 2. LOGIKA SWITCH TANGGAL (1-15 & 16-31) ===
+        const today = new Date();
+        const currentDay = today.getDate(); // 1 - 31
+        const activeServer = (currentDay <= 15) ? SERVER_1 : SERVER_2;
+
+        // Path gambar logo
+        const logoPath = "/storage/settings/rvcMSGBiimeHugzEGeJ066Bq3MlSwn3ekYiWj7MD.png";
+        const fallbackLogoPath = "/img/logo-aljihad-transparent.png";
+
+        // Pasang logo & fallback
+        const splashImg = document.getElementById('splash-img');
+        splashImg.src = activeServer + logoPath;
+        splashImg.onerror = function() {
+            this.onerror = null;
+            this.src = activeServer + fallbackLogoPath;
+        };
+
+        // Pasang URL ke Iframe
+        const mainFrame = document.getElementById('main-frame');
+        mainFrame.src = activeServer;
+
+        // === 3. TIMEOUT SPLASH SCREEN (20 Detik) ===
+        const splash = document.getElementById('splash');
         setTimeout(() => {
             splash.style.opacity = '0';
             setTimeout(() => {
