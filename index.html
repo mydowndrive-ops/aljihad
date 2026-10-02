@@ -36,7 +36,7 @@
             align-items: center;
             z-index: 999;
             color: #ffffff;
-            transition: opacity 1s ease;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
         }
         .splash-logo-wrapper {
             position: relative;
@@ -87,77 +87,174 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            padding: 6px 22px;
+            padding: 8px 24px;
             border-radius: 30px;
-            background: rgba(0, 0, 0, 0.45);
+            background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(212, 175, 55, 0.4);
-            font-size: clamp(11px, 1vw, 14px);
+            font-size: clamp(11px, 1vw, 13px);
             color: #E2E8F0;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             font-weight: 600;
+            transition: all 0.3s ease;
         }
         .dot {
-            width: 8px;
-            height: 8px;
+            width: 9px;
+            height: 9px;
             background: #FFD700;
             border-radius: 50%;
-            box-shadow: 0 0 8px #FFD700;
+            box-shadow: 0 0 10px #FFD700;
+            animation: dotBlink 1.2s infinite ease-in-out;
+        }
+        @keyframes dotBlink {
+            0%, 100% { opacity: 0.3; transform: scale(0.85); }
+            50% { opacity: 1; transform: scale(1.15); }
         }
     </style>
 </head>
 <body>
 
+    <!-- Splash Screen Dinamis -->
     <div id="splash">
         <div class="splash-logo-wrapper">
             <div class="splash-spinner-ring"></div>
-            <img id="splash-img"
-                 alt="Logo Masjid Al-Jihad"
-                 class="splash-logo-img">
+            <img id="splash-img" alt="Logo Masjid Al-Jihad" class="splash-logo-img">
         </div>
         <h2 class="title">MASJID JAMI' AL JIHAD</h2>
         <div class="status-pill">
-            <span class="dot"></span>
-            <span id="status-text">MEMUAT TAMPILAN...</span>
+            <span class="dot" id="status-dot"></span>
+            <span id="status-text">MEMERIKSA TANGGAL SERVER...</span>
         </div>
     </div>
 
-    <!-- Iframe display TV (src diset lewat JavaScript) -->
-    <iframe id="main-frame" allow="autoplay"></iframe>
+    <!-- Iframe Display TV -->
+    <iframe id="main-frame" allow="autoplay; fullscreen" loading="eager"></iframe>
 
     <script>
-        // === 1. KONFIGURASI URL DUA AKUN RENDER ===
-        const SERVER_1 = "https://digitalaljihad1.onrender.com";
-        const SERVER_2 = "https://digital-aljihad.onrender.com"; // Sesuaikan dengan domain akun 2
+        // ========================================================
+        // 1. KONFIGURASI DUA AKUN RENDER
+        // ========================================================
+        const SERVER_1 = "https://digitalaljihad1.onrender.com";   // Aktif: Tanggal 1 s/d 15
+        const SERVER_2 = "https://digital-aljihad.onrender.com";  // Aktif: Tanggal 16 s/d 31
 
-        // === 2. LOGIKA SWITCH TANGGAL (1-15 & 16-31) ===
-        const today = new Date();
-        const currentDay = today.getDate(); // 1 - 31
-        const activeServer = (currentDay <= 15) ? SERVER_1 : SERVER_2;
-
-        // Path gambar logo
+        // Path logo masjid
         const logoPath = "/storage/settings/rvcMSGBiimeHugzEGeJ066Bq3MlSwn3ekYiWj7MD.png";
         const fallbackLogoPath = "/img/logo-aljihad-transparent.png";
 
-        // Pasang logo & fallback
+        // ========================================================
+        // 2. PENENTUAN SERVER BERDASARKAN TANGGAL
+        // ========================================================
+        let currentDayActive = new Date().getDate(); // 1 - 31
+        let primaryServer = (currentDayActive <= 15) ? SERVER_1 : SERVER_2;
+        let backupServer  = (currentDayActive <= 15) ? SERVER_2 : SERVER_1;
+        
+        let primaryLabel = (currentDayActive <= 15) ? "RENDER 1 (Tgl 1-15)" : "RENDER 2 (Tgl 16-31)";
+        let backupLabel  = (currentDayActive <= 15) ? "RENDER 2 (Cadangan)" : "RENDER 1 (Cadangan)";
+
+        let isDisplayLoaded = false;
+        let coldStartTimer = null;
+        let failoverTimer = null;
+
+        const splash = document.getElementById('splash');
+        const statusText = document.getElementById('status-text');
         const splashImg = document.getElementById('splash-img');
-        splashImg.src = activeServer + logoPath;
+        const mainFrame = document.getElementById('main-frame');
+
+        // Pasang logo pada splash screen
+        splashImg.src = primaryServer + logoPath;
         splashImg.onerror = function() {
             this.onerror = null;
-            this.src = activeServer + fallbackLogoPath;
+            this.src = primaryServer + fallbackLogoPath;
+            // Jika di primaryServer gagal, coba ambil logo dari backupServer
+            this.onerror = function() {
+                this.src = backupServer + fallbackLogoPath;
+            };
         };
 
-        // Pasang URL ke Iframe
-        const mainFrame = document.getElementById('main-frame');
-        mainFrame.src = activeServer;
+        function updateStatus(msg) {
+            if (statusText) statusText.textContent = msg;
+        }
 
-        // === 3. TIMEOUT SPLASH SCREEN (20 Detik) ===
-        const splash = document.getElementById('splash');
-        setTimeout(() => {
-            splash.style.opacity = '0';
+        // ========================================================
+        // 3. FUNGSI MENUTUP SPLASH SCREEN SECARA HALUS
+        // ========================================================
+        function dismissSplash() {
+            if (isDisplayLoaded) return;
+            isDisplayLoaded = true;
+            if (coldStartTimer) clearTimeout(coldStartTimer);
+            if (failoverTimer) clearTimeout(failoverTimer);
+
+            updateStatus("TAMPILAN SIAP");
             setTimeout(() => {
-                splash.style.display = 'none';
-            }, 1000);
-        }, 20000);
+                splash.style.opacity = '0';
+                setTimeout(() => {
+                    splash.style.visibility = 'hidden';
+                    splash.style.display = 'none';
+                }, 800);
+            }, 600);
+        }
+
+        // ========================================================
+        // 4. MEMUAT SERVER KE IFRAME
+        // ========================================================
+        function startLoadingServer(targetUrl, targetLabel, isFallbackAttempt = false) {
+            updateStatus(`MENGHUBUNGKAN: ${targetLabel}...`);
+            mainFrame.src = targetUrl;
+
+            // Jika butuh waktu > 7 detik, kemungkinan Render sedang Cold Start
+            coldStartTimer = setTimeout(() => {
+                if (!isDisplayLoaded) {
+                    updateStatus("MEMBANGUNKAN SERVER RENDER...");
+                }
+            }, 7000);
+
+            // Jika dalam 30 detik server belum terbuka dan belum mencoba fallback:
+            // Alihkan otomatis ke akun Render yang satunya
+            if (!isFallbackAttempt) {
+                failoverTimer = setTimeout(() => {
+                    if (!isDisplayLoaded) {
+                        clearTimeout(coldStartTimer);
+                        console.warn("Server utama tidak merespon/suspend. Beralih ke akun Render cadangan...");
+                        updateStatus(`MENCOBA ${backupLabel}...`);
+                        startLoadingServer(backupServer, backupLabel, true);
+                    }
+                }, 30000);
+            }
+        }
+
+        // Jalankan pemuatan server utama saat pertama dibuka
+        startLoadingServer(primaryServer, primaryLabel, false);
+
+        // Saat iframe selesai memuat konten
+        mainFrame.onload = function() {
+            dismissSplash();
+        };
+
+        // Batas maksimal mutlak: jika setelah 50 detik belum tertutup, paksa buka splash
+        setTimeout(() => {
+            if (!isDisplayLoaded) {
+                dismissSplash();
+            }
+        }, 50000);
+
+        // ========================================================
+        // 5. MONITOR PERGANTIAN HARI & AUTO-SWITCH TENGAH MALAM
+        // ========================================================
+        // Mengecek tanggal setiap 60 detik. Saat pergantian tanggal dari 15 ke 16 (atau akhir bulan ke tgl 1),
+        // TV akan otomatis reload dan beralih server sendiri tanpa perlu disentuh.
+        setInterval(() => {
+            const now = new Date();
+            const checkedDay = now.getDate();
+            if (checkedDay !== currentDayActive) {
+                console.log("Pergantian tanggal terdeteksi! Memperbarui akun Render...");
+                window.location.reload();
+            }
+
+            // Pemeliharaan rutin memori TV setiap pukul 03:15 WIB (sebelum Subuh)
+            if (now.getHours() === 3 && now.getMinutes() === 15 && now.getSeconds() < 60) {
+                console.log("Penyegaran memori TV harian (03:15 WIB)...");
+                window.location.reload();
+            }
+        }, 60000);
     </script>
 </body>
 </html>
